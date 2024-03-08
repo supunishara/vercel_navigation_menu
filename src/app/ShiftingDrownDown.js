@@ -9,11 +9,136 @@ import {
   FiHome,
   FiPieChart,
 } from "react-icons/fi";
+import {
+  useGetAllProductsQuery,
+  useGetProductByIdQuery,
+  useAddNewProductMutation,
+  useUpdateProductMutation,
+} from "./service/DummyData";
+
+import { productsApi } from "./service/DummyData";
 
 const ShiftingDrownDown = () => {
+  const [selectedId, setSelectedId] = useState(null);
+
+  const {
+    data: allProductsData,
+    isError: allProductsError,
+    isLoading: allProductsLoading,
+  } = useGetAllProductsQuery();
+  // console.log("allProductsData-------", allProductsData);
+
+  const {
+    data: singleProductsData,
+    isError: singleProductsError,
+    isLoading: singleProductsLoading,
+  } = useGetProductByIdQuery(2);
+  // console.log("singleProductsData-------", singleProductsData);
+
+  const [
+    addNewProduct,
+    {
+      data: addNewProductData,
+      error: addNewProductError,
+      isLoading: addNewProductLoading,
+    },
+  ] = useAddNewProductMutation();
+  // console.log("AddProductsData-------", addNewProductData);
+
+  const [
+    updateProduct,
+    {
+      data: updateProductData,
+      error: updateProductError,
+      isLoading: updateProductLoading,
+    },
+  ] = useUpdateProductMutation();
+
+  console.log("updateProductData-------", updateProductData);
+
+  if (allProductsError) {
+    return <p> WE GOT AN ERROR</p>;
+  }
+
+  if (allProductsLoading) {
+    return <p> LOADING</p>;
+  }
+
+  const handleAddProduct = async () => {
+    try {
+      const newProductData = {
+        id: 1,
+        title: "Amazing Tshirt",
+        description: "greadt product",
+      };
+
+      await addNewProduct(newProductData);
+    } catch (err) {
+      console.log("Error adding new Product", err);
+    }
+  };
+
+  const handleUpdateProduct = async () => {
+    try {
+      const updatedProductData = {
+        title: "Well said",
+      };
+      await updateProduct({ id: 4, updatedProduct: updatedProductData });
+    } catch (err) {
+      console.log("Error updating Product", err);
+    }
+  };
+
   return (
-    <div className="flex h-96 w-full justify-start bg-neutral-950 p-8 text-neutral-200 md:justify-center">
-      <Tabs />
+    <div>
+      <div className="flex h-96 w-full justify-start bg-neutral-950 p-8 text-neutral-200 md:justify-center ">
+        <Tabs />
+      </div>
+
+      {/* rotate view */}
+      <div class="transform rotate-[17deg] rounded-xl h-40 w-40 sm:h-64 sm:w-64 bg-white shadow-xl transition duration-300 hover:rotate-45">
+        <div class="flex h-full justify-center items-center">
+          <span class="font-bold text-green-600">Rotate</span>
+        </div>
+      </div>
+
+      <div className="w-full h-full items-center justify-center">
+        <button
+          className="border border-red-300 rounded-md px-2 py-2"
+          onClick={handleAddProduct}
+        >
+          Add New Products
+        </button>
+
+        <button
+          className="border border-green-300 rounded-md px-2 py-2 ml-5"
+          onClick={handleUpdateProduct}
+        >
+          Update Product
+        </button>
+
+        {/* bottom view */}
+        {allProductsData?.products.map((p) => (
+          <motion.div
+            layoutId={p.id}
+            className="h-[350px] w-[100px] border border-cyan-800 rounded-md my-[20px] cursor-pointer"
+            onClick={() => setSelectedId(p.id)}
+          >
+            <div key={p.id}>{p.title}</div>
+            <p>{p.description}</p>
+          </motion.div>
+        ))}
+
+        <AnimatePresence>
+          {selectedId && (
+            <motion.div layoutId={selectedId}>
+              {/* <motion.h5>{item.subtitle}</motion.h5>
+              <motion.h2>{item.title}</motion.h2>
+              <motion.button onClick={() => setSelectedId(null)} /> */}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

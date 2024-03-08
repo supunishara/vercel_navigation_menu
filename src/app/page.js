@@ -1,9 +1,17 @@
+"use client";
+
 import ShiftingDropDown from "./ShiftingDrownDown";
+import AnimatedSideBar from "./AnimatedSideBar";
+import { store } from "../app/redux/Store";
+import { Provider } from "react-redux";
 
 export default function Home() {
   return (
     <main>
-      <ShiftingDropDown />
+      <Provider store={store}>
+        {/* <ShiftingDropDown /> */}
+        <AnimatedSideBar />
+      </Provider>
     </main>
   );
 }
